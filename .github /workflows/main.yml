@@ -1,0 +1,70 @@
+name: SayHello
+
+on:
+   push:
+     branches:
+       - develop
+       - main
+       
+   pull_request:
+     branches:
+       - main
+       - develop
+       
+jobs:
+  detect-branch:                       
+     runs-on: ubuntu-latest            
+
+     steps:
+       - name: Get Your Code
+         uses: actions/checkout@v4   
+          
+       - name: Say Hello Develop
+         if: ${{ github.ref == 'refs/heads/develop' }}
+         run: echo "Hello, develop!"
+         
+       - name: Say Hello Main
+         if: ${{ github.ref == 'refs/heads/main' }}
+         run: echo "Hello, main!"
+
+  detect-pr:
+      runs-on: ubuntu-latest
+
+      steps:
+        - name: Get your code
+          uses: actions/checkout@v4
+
+        - name: PR
+          if: github.event_name == 'pull_request'
+
+
+          run: echo "hello pull request"
+
+  minify:
+      runs-on: ubuntu-latest
+ 
+      steps:
+       - uses: actions/checkout@v4
+
+       - name: Setup Node.js
+         uses: actions/setup-node@v2
+         with:
+           node-version: '20'  
+
+       - name: Install minify
+         run: npm install minify -g
+
+       - name: Set up Python
+         uses: actions/setup-python@v2
+         with:
+             python-version: '3.x'
+             
+       - name: Run minification script
+         run: python minify_all.py
+
+       - name: Commit minified file
+         uses: stefanzweifel/git-auto-commit-action@v5
+
+         with:
+            commit_message: "Minify Listo"
+  
